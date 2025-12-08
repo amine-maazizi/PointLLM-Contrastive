@@ -1,0 +1,40 @@
+# Data and models
+data/
+models/
+checkpoints/
+
+# Point-BERT
+src/Point-BERT/
+Point-BERT/
+
+# Environment
+.env/
+venv/
+env/
+
+# Tokens
+.hf_token
+.env/.hf_token
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

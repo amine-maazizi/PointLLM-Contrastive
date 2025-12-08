@@ -1,0 +1,13 @@
+objaverse 
+trimesh 
+transformers
+accelerate>=0.26.0
+einops 
+timm 
+tensorboard 
+h5py 
+tqdm
+pyyaml
+scikit-learn
+matplotlib
+scipy
