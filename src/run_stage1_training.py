@@ -46,13 +46,13 @@ def main():
     os.makedirs(SAVE_DIR, exist_ok=True)
     
     # Training hyperparameters
-    NUM_EPOCHS = 10
+    NUM_EPOCHS = 5
     BATCH_SIZE = 1
     LEARNING_RATE = 1e-4  # Reduced from 1e-3 for stability
     GRADIENT_ACCUMULATION_STEPS = 4
     VAL_SAMPLES = 100
     SEED = 42
-    LOSS_TYPE = "contrastive"  # Options: "generative" (default) or "contrastive"
+    LOSS_TYPE = "generative"  # Options: "generative" (default) or "contrastive"
     
     # Device
     DEVICE = "cuda" if torch.cuda.is_available() else "cpu"

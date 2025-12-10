@@ -214,9 +214,9 @@ def visualize_tsne_comparison(
         random_state: Random seed for reproducibility
     """
     fig, ax = plt.subplots(1, 1, figsize=(14, 11))
-    print("\n" + "=" * 50)
-    print("COMPARING INITIAL vs GENERATIVE vs CONTRASTIVE")
-    print("=" * 50)
+    # print("\n" + "=" * 50)
+    # print("COMPARING INITIAL vs GENERATIVE vs CONTRASTIVE")
+    # print("=" * 50)
     
     # Combine all features for joint t-SNE
     n_points = point_features_generative.shape[0]
@@ -226,34 +226,34 @@ def visualize_tsne_comparison(
         point_features_contrastive,
         text_embeddings
     ])
-    print(f"Combined features shape: {combined.shape}")
-    print(f"  Initial (untrained) points: {point_features_initial.shape[0]}")
-    print(f"  Generative points: {point_features_generative.shape[0]}")
-    print(f"  Contrastive points: {point_features_contrastive.shape[0]}")
-    print(f"  Text embeddings: {text_embeddings.shape[0]}")
+    # print(f"Combined features shape: {combined.shape}")
+    # print(f"  Initial (untrained) points: {point_features_initial.shape[0]}")
+    # print(f"  Generative points: {point_features_generative.shape[0]}")
+    # print(f"  Contrastive points: {point_features_contrastive.shape[0]}")
+    # print(f"  Text embeddings: {text_embeddings.shape[0]}")
     
     # Compute alignment metrics
     init_metrics = compute_alignment_metrics(point_features_initial, text_embeddings)
     gen_metrics = compute_alignment_metrics(point_features_generative, text_embeddings)
     cont_metrics = compute_alignment_metrics(point_features_contrastive, text_embeddings)
     
-    print(f"\nInitial (untrained) alignment metrics:")
-    print(f"  Centroid distance: {init_metrics['centroid_distance']:.4f}")
-    print(f"  Avg pairwise distance: {init_metrics['avg_pairwise_distance']:.4f}")
-    print(f"  Avg cosine similarity: {init_metrics['avg_cosine_similarity']:.4f}")
-    
-    print(f"\nGenerative alignment metrics:")
-    print(f"  Centroid distance: {gen_metrics['centroid_distance']:.4f}")
-    print(f"  Avg pairwise distance: {gen_metrics['avg_pairwise_distance']:.4f}")
-    print(f"  Avg cosine similarity: {gen_metrics['avg_cosine_similarity']:.4f}")
-    
-    print(f"\nContrastive alignment metrics:")
-    print(f"  Centroid distance: {cont_metrics['centroid_distance']:.4f}")
-    print(f"  Avg pairwise distance: {cont_metrics['avg_pairwise_distance']:.4f}")
-    print(f"  Avg cosine similarity: {cont_metrics['avg_cosine_similarity']:.4f}")
+    # print(f"\nInitial (untrained) alignment metrics:")
+    # print(f"  Centroid distance: {init_metrics['centroid_distance']:.4f}")
+    # print(f"  Avg pairwise distance: {init_metrics['avg_pairwise_distance']:.4f}")
+    # print(f"  Avg cosine similarity: {init_metrics['avg_cosine_similarity']:.4f}")
+    # 
+    # print(f"\nGenerative alignment metrics:")
+    # print(f"  Centroid distance: {gen_metrics['centroid_distance']:.4f}")
+    # print(f"  Avg pairwise distance: {gen_metrics['avg_pairwise_distance']:.4f}")
+    # print(f"  Avg cosine similarity: {gen_metrics['avg_cosine_similarity']:.4f}")
+    # 
+    # print(f"\nContrastive alignment metrics:")
+    # print(f"  Centroid distance: {cont_metrics['centroid_distance']:.4f}")
+    # print(f"  Avg pairwise distance: {cont_metrics['avg_pairwise_distance']:.4f}")
+    # print(f"  Avg cosine similarity: {cont_metrics['avg_cosine_similarity']:.4f}")
     
     # Run t-SNE on combined features
-    print("\nRunning t-SNE on combined features...")
+    # print("\nRunning t-SNE on combined features...")
     perp = min(perplexity, combined.shape[0] - 1)
     tsne = TSNE(n_components=2, perplexity=perp, random_state=random_state, n_iter=1000)
     combined_2d = tsne.fit_transform(combined)
@@ -264,18 +264,23 @@ def visualize_tsne_comparison(
     cont_2d = combined_2d[2*n_points:3*n_points]
     text_2d = combined_2d[3*n_points:]
     
-    # Plot all four groups
+    # Plot all four groups with cosine similarity in legend
+    init_label = f'Initial (cos: {init_metrics["avg_cosine_similarity"]:.3f})'
+    gen_label = f'Generative (cos: {gen_metrics["avg_cosine_similarity"]:.3f})'
+    cont_label = f'Contrastive (cos: {cont_metrics["avg_cosine_similarity"]:.3f})'
+    text_label = 'Text Tokens'
+    
     ax.scatter(init_2d[:, 0], init_2d[:, 1], 
-               c='#95a5a6', s=100, alpha=0.6, label='Initial (Untrained)', 
+               c='#95a5a6', s=100, alpha=0.6, label=init_label, 
                marker='o', edgecolors='black', linewidths=0.5)
     ax.scatter(gen_2d[:, 0], gen_2d[:, 1], 
-               c='#3498db', s=120, alpha=0.7, label='Generative Loss', 
+               c='#3498db', s=120, alpha=0.7, label=gen_label, 
                marker='o', edgecolors='black', linewidths=0.5)
     ax.scatter(cont_2d[:, 0], cont_2d[:, 1], 
-               c='#9b59b6', s=120, alpha=0.7, label='Contrastive Loss', 
+               c='#9b59b6', s=120, alpha=0.7, label=cont_label, 
                marker='s', edgecolors='black', linewidths=0.5)
     ax.scatter(text_2d[:, 0], text_2d[:, 1], 
-               c='#e74c3c', s=80, alpha=0.6, label='Text Embeddings', 
+               c='#e74c3c', s=80, alpha=0.6, label=text_label, 
                marker='^', edgecolors='black', linewidths=0.3)
     
     ax.set_title('TinyLlama: Untrained vs Generative vs Contrastive Training\nt-SNE Visualization of Feature Alignment', 
@@ -285,61 +290,290 @@ def visualize_tsne_comparison(
     ax.legend(loc='upper right', fontsize=11, framealpha=0.9)
     ax.grid(True, alpha=0.3)
     
-    # Add metrics comparison text box
-    metrics_text = (
-        f"Initial (Untrained):\n"
-        f"  Centroid dist: {init_metrics['centroid_distance']:.2f}\n"
-        f"  Avg cos sim: {init_metrics['avg_cosine_similarity']:.3f}\n\n"
-        f"Generative Loss:\n"
-        f"  Centroid dist: {gen_metrics['centroid_distance']:.2f}\n"
-        f"  Avg cos sim: {gen_metrics['avg_cosine_similarity']:.3f}\n\n"
-        f"Contrastive Loss:\n"
-        f"  Centroid dist: {cont_metrics['centroid_distance']:.2f}\n"
-        f"  Avg cos sim: {cont_metrics['avg_cosine_similarity']:.3f}"
-    )
-    ax.text(0.02, 0.98, metrics_text, transform=ax.transAxes, fontsize=9,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    # # Add metrics comparison text box
+    # metrics_text = (
+    #     f"Initial (Untrained):\n"
+    #     f"  Centroid dist: {init_metrics['centroid_distance']:.2f}\n"
+    #     f"  Avg cos sim: {init_metrics['avg_cosine_similarity']:.3f}\n\n"
+    #     f"Generative Loss:\n"
+    #     f"  Centroid dist: {gen_metrics['centroid_distance']:.2f}\n"
+    #     f"  Avg cos sim: {gen_metrics['avg_cosine_similarity']:.3f}\n\n"
+    #     f"Contrastive Loss:\n"
+    #     f"  Centroid dist: {cont_metrics['centroid_distance']:.2f}\n"
+    #     f"  Avg cos sim: {cont_metrics['avg_cosine_similarity']:.3f}"
+    # )
+    # ax.text(0.02, 0.98, metrics_text, transform=ax.transAxes, fontsize=9,
+    #         verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
     
     # Print comparison
-    print("\n" + "=" * 50)
-    print("THREE-WAY COMPARISON")
-    print("=" * 50)
-    print(f"{'Metric':<25} {'Initial':>12} {'Generative':>12} {'Contrastive':>12} {'Best':>12}")
-    print("-" * 80)
+    # print("\n" + "=" * 50)
+    # print("THREE-WAY COMPARISON")
+    # print("=" * 50)
+    # print(f"{'Metric':<25} {'Initial':>12} {'Generative':>12} {'Contrastive':>12} {'Best':>12}")
+    # print("-" * 80)
     
-    for key in ['centroid_distance', 'avg_pairwise_distance', 'avg_cosine_similarity']:
-        init_val = init_metrics[key]
-        gen_val = gen_metrics[key]
-        cont_val = cont_metrics[key]
-        
-        if key == 'avg_cosine_similarity':
-            best_val = max(init_val, gen_val, cont_val)
-            if best_val == cont_val:
-                best = "Contrastive"
-            elif best_val == gen_val:
-                best = "Generative"
-            else:
-                best = "Initial"
-        else:
-            best_val = min(init_val, gen_val, cont_val)
-            if best_val == cont_val:
-                best = "Contrastive"
-            elif best_val == gen_val:
-                best = "Generative"
-            else:
-                best = "Initial"
-        
-        print(f"{key:<25} {init_val:>12.4f} {gen_val:>12.4f} {cont_val:>12.4f} {best:>12}")
+    # for key in ['centroid_distance', 'avg_pairwise_distance', 'avg_cosine_similarity']:
+    #     init_val = init_metrics[key]
+    #     gen_val = gen_metrics[key]
+    #     cont_val = cont_metrics[key]
+    #     
+    #     if key == 'avg_cosine_similarity':
+    #         best_val = max(init_val, gen_val, cont_val)
+    #         if best_val == cont_val:
+    #             best = "Contrastive"
+    #         elif best_val == gen_val:
+    #             best = "Generative"
+    #         else:
+    #             best = "Initial"
+    #     else:
+    #         best_val = min(init_val, gen_val, cont_val)
+    #         if best_val == cont_val:
+    #             best = "Contrastive"
+    #         elif best_val == gen_val:
+    #             best = "Generative"
+    #         else:
+    #             best = "Initial"
+    #     
+    #     print(f"{key:<25} {init_val:>12.4f} {gen_val:>12.4f} {cont_val:>12.4f} {best:>12}")
     
     plt.tight_layout()
     
     if save_path:
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
-        print(f"\nFigure saved to {save_path}")
+        # print(f"\nFigure saved to {save_path}")
     
     plt.show()
     
     return init_metrics, gen_metrics, cont_metrics
+
+def diagnose_alignment_failure(
+    point_features_initial: np.ndarray,
+    point_features_generative: np.ndarray,
+    point_features_contrastive: np.ndarray,
+    text_embeddings: np.ndarray,
+    save_path: str = None
+):
+    """
+    Deep dive into why alignment might be failing.
+    """
+    print("\n" + "="*80)
+    print("COMPREHENSIVE ALIGNMENT DIAGNOSTICS")
+    print("="*80)
+    
+    # 1. MAGNITUDE ANALYSIS
+    print("\n1. MAGNITUDE ANALYSIS (L2 Norms)")
+    print("-" * 80)
+    
+    init_norms = np.linalg.norm(point_features_initial, axis=1)
+    gen_norms = np.linalg.norm(point_features_generative, axis=1)
+    cont_norms = np.linalg.norm(point_features_contrastive, axis=1)
+    text_norms = np.linalg.norm(text_embeddings, axis=1)
+    
+    print(f"Text embeddings:        mean={text_norms.mean():.2f}, std={text_norms.std():.2f}")
+    print(f"Initial (untrained):    mean={init_norms.mean():.2f}, std={init_norms.std():.2f}")
+    print(f"Generative:             mean={gen_norms.mean():.2f}, std={gen_norms.std():.2f}")
+    print(f"Contrastive:            mean={cont_norms.mean():.2f}, std={cont_norms.std():.2f}")
+    
+    print(f"\n⚠️  PROBLEM CHECK:")
+    if cont_norms.mean() > text_norms.mean() * 2:
+        print(f"   ❌ Contrastive magnitudes are {cont_norms.mean()/text_norms.mean():.1f}x larger than text!")
+        print(f"      This inflates distances despite good angles (cosine similarity)")
+    else:
+        print(f"   ✓ Magnitudes are reasonable")
+    
+    # 2. CENTROID ANALYSIS
+    print("\n2. CENTROID ANALYSIS")
+    print("-" * 80)
+    
+    init_centroid = point_features_initial.mean(axis=0)
+    gen_centroid = point_features_generative.mean(axis=0)
+    cont_centroid = point_features_contrastive.mean(axis=0)
+    text_centroid = text_embeddings.mean(axis=0)
+    
+    init_dist = np.linalg.norm(init_centroid - text_centroid)
+    gen_dist = np.linalg.norm(gen_centroid - text_centroid)
+    cont_dist = np.linalg.norm(cont_centroid - text_centroid)
+    
+    print(f"Distance from text centroid:")
+    print(f"  Initial (untrained):  {init_dist:.2f}")
+    print(f"  Generative:           {gen_dist:.2f}  ({gen_dist/init_dist:.2f}x initial)")
+    print(f"  Contrastive:          {cont_dist:.2f}  ({cont_dist/init_dist:.2f}x initial)")
+    
+    print(f"\n⚠️  MOVEMENT CHECK:")
+    if cont_dist > init_dist:
+        print(f"   ❌ Contrastive MOVED AWAY from text (worse than random init!)")
+        print(f"      Delta: +{cont_dist - init_dist:.2f}")
+    else:
+        print(f"   ✓ Contrastive moved toward text")
+        print(f"      Delta: {cont_dist - init_dist:.2f}")
+    
+    # 3. VARIANCE ANALYSIS
+    print("\n3. CLUSTER SPREAD ANALYSIS")
+    print("-" * 80)
+    
+    init_var = np.var(point_features_initial, axis=0).mean()
+    gen_var = np.var(point_features_generative, axis=0).mean()
+    cont_var = np.var(point_features_contrastive, axis=0).mean()
+    text_var = np.var(text_embeddings, axis=0).mean()
+    
+    print(f"Variance (spread of cluster):")
+    print(f"  Text embeddings:      {text_var:.2f}")
+    print(f"  Initial (untrained):  {init_var:.2f}")
+    print(f"  Generative:           {gen_var:.2f}")
+    print(f"  Contrastive:          {cont_var:.2f}")
+    
+    print(f"\n⚠️  TIGHTNESS CHECK:")
+    if cont_var < gen_var * 0.5:
+        print(f"   ⚠️  Contrastive creates VERY tight clusters (good for discrimination)")
+        print(f"      But might be pushing them away from text to maintain separation")
+    
+    # 4. NEAREST NEIGHBOR ANALYSIS
+    print("\n4. NEAREST NEIGHBOR ANALYSIS")
+    print("-" * 80)
+    
+    # For each point feature, find nearest text embedding
+    init_to_text = cdist(point_features_initial, text_embeddings, 'euclidean')
+    gen_to_text = cdist(point_features_generative, text_embeddings, 'euclidean')
+    cont_to_text = cdist(point_features_contrastive, text_embeddings, 'euclidean')
+    
+    init_nearest = init_to_text.min(axis=1).mean()
+    gen_nearest = gen_to_text.min(axis=1).mean()
+    cont_nearest = cont_to_text.min(axis=1).mean()
+    
+    print(f"Average distance to nearest text token:")
+    print(f"  Initial (untrained):  {init_nearest:.2f}")
+    print(f"  Generative:           {gen_nearest:.2f}")
+    print(f"  Contrastive:          {cont_nearest:.2f}")
+    
+    # 5. COSINE VS EUCLIDEAN DIVERGENCE
+    print("\n5. COSINE VS EUCLIDEAN DIVERGENCE")
+    print("-" * 80)
+    
+    # Normalize and check if euclidean distances match cosine
+    init_norm = point_features_initial / (np.linalg.norm(point_features_initial, axis=1, keepdims=True) + 1e-8)
+    text_norm = text_embeddings / (np.linalg.norm(text_embeddings, axis=1, keepdims=True) + 1e-8)
+    
+    # After normalization, should align better?
+    init_norm_centroid = init_norm.mean(axis=0)
+    text_norm_centroid = text_norm.mean(axis=0)
+    normalized_dist = np.linalg.norm(init_norm_centroid - text_norm_centroid)
+    
+    print(f"After L2 normalization:")
+    print(f"  Centroid distance drops from {init_dist:.2f} to {normalized_dist:.2f}")
+    print(f"\n⚠️  DIAGNOSIS:")
+    if normalized_dist < init_dist * 0.5:
+        print(f"   ❌ MAGNITUDE MISMATCH is the main problem!")
+        print(f"      Your projectors are outputting vectors with wrong scale")
+        print(f"      Solution: Add magnitude normalization or regularization")
+    
+    # 6. VISUALIZATION
+    fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+    
+    # Plot 1: Magnitude distributions
+    ax = axes[0, 0]
+    ax.hist(text_norms, bins=30, alpha=0.5, label='Text', color='red')
+    ax.hist(init_norms, bins=30, alpha=0.5, label='Initial', color='gray')
+    ax.hist(gen_norms, bins=30, alpha=0.5, label='Generative', color='blue')
+    ax.hist(cont_norms, bins=30, alpha=0.5, label='Contrastive', color='purple')
+    ax.set_xlabel('L2 Norm (Magnitude)')
+    ax.set_ylabel('Count')
+    ax.set_title('Magnitude Distribution\n(Should overlap with text)')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # Plot 2: Distance to text centroid
+    ax = axes[0, 1]
+    methods = ['Initial', 'Generative', 'Contrastive']
+    distances = [init_dist, gen_dist, cont_dist]
+    colors = ['gray', 'blue', 'purple']
+    bars = ax.bar(methods, distances, color=colors, alpha=0.7, edgecolor='black')
+    ax.axhline(y=0, color='red', linestyle='--', linewidth=2, label='Text centroid')
+    ax.set_ylabel('Euclidean Distance')
+    ax.set_title('Centroid Distance to Text\n(Lower is better)')
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Annotate with values
+    for bar, dist in zip(bars, distances):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{dist:.1f}',
+                ha='center', va='bottom', fontweight='bold')
+    
+    # Plot 3: Variance comparison
+    ax = axes[1, 0]
+    methods = ['Text', 'Initial', 'Gen', 'Cont']
+    variances = [text_var, init_var, gen_var, cont_var]
+    colors = ['red', 'gray', 'blue', 'purple']
+    ax.bar(methods, variances, color=colors, alpha=0.7, edgecolor='black')
+    ax.set_ylabel('Average Variance')
+    ax.set_title('Cluster Spread\n(Text-like spread is good)')
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Plot 4: Nearest neighbor distances
+    ax = axes[1, 1]
+    methods = ['Initial', 'Generative', 'Contrastive']
+    nn_dists = [init_nearest, gen_nearest, cont_nearest]
+    colors = ['gray', 'blue', 'purple']
+    bars = ax.bar(methods, nn_dists, color=colors, alpha=0.7, edgecolor='black')
+    ax.set_ylabel('Average Distance')
+    ax.set_title('Distance to Nearest Text Token\n(Lower is better)')
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Annotate
+    for bar, dist in zip(bars, nn_dists):
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{dist:.1f}',
+                ha='center', va='bottom', fontweight='bold')
+    
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        print(f"\nDiagnostics plot saved to {save_path}")
+    
+    plt.show()
+    
+    # 7. ROOT CAUSE SUMMARY
+    print("\n" + "="*80)
+    print("ROOT CAUSE ANALYSIS")
+    print("="*80)
+    
+    issues = []
+    
+    # Check magnitude mismatch
+    if cont_norms.mean() > text_norms.mean() * 1.5:
+        issues.append("MAGNITUDE MISMATCH: Projector outputs are too large")
+    
+    # Check if moving away
+    if cont_dist > init_dist:
+        issues.append("WRONG DIRECTION: Training pushes features AWAY from text")
+    
+    # Check loss function issue
+    if cont_var < gen_var * 0.3 and cont_dist > gen_dist:
+        issues.append("CONTRASTIVE COLLAPSE: Creating tight, separated clusters far from text")
+    
+    if not issues:
+        print("✓ No obvious issues found - alignment looks good!")
+    else:
+        print("Found the following issues:\n")
+        for i, issue in enumerate(issues, 1):
+            print(f"{i}. {issue}")
+    
+    return {
+        'magnitudes': {
+            'text': text_norms.mean(),
+            'initial': init_norms.mean(),
+            'generative': gen_norms.mean(),
+            'contrastive': cont_norms.mean()
+        },
+        'centroid_distances': {
+            'initial': init_dist,
+            'generative': gen_dist,
+            'contrastive': cont_dist
+        },
+        'issues': issues
+    }
 
 
 def main():
@@ -372,7 +606,7 @@ def main():
     
     # Fixed model paths for TinyLlama
     MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-    GENERATIVE_DIR = os.path.join(args.checkpoint_dir, "TinyLlama-1.1B-Chat-v1.0")
+    GENERATIVE_DIR = os.path.join(args.checkpoint_dir, "TinyLlama-1.1B-Chat-v1.0_generative")
     CONTRASTIVE_DIR = os.path.join(args.checkpoint_dir, "TinyLlama-1.1B-Chat-v1.0_contrastive")
     
     # Check if both exist
@@ -493,6 +727,18 @@ def main():
     
     save_path = "./tsne_comparison_all.png"
     
+    # print("\n" + "="*70)
+    # print("RUNNING DIAGNOSTICS...")
+    # print("="*70)
+    # 
+    # diagnostics = diagnose_alignment_failure(
+    #     point_features_initial=init_projected,
+    #     point_features_generative=gen_projected,
+    #     point_features_contrastive=cont_projected,
+    #     text_embeddings=text_embeddings,
+    #     save_path="./alignment_diagnostics.png"
+    # )
+
     init_metrics, gen_metrics, cont_metrics = visualize_tsne_comparison(
         point_features_initial=init_projected,
         point_features_generative=gen_projected,
@@ -504,40 +750,41 @@ def main():
     )
     
     # Final summary
-    print("\n" + "=" * 70)
-    print("SUMMARY")
-    print("=" * 70)
-    print("✓ Visualization complete!")
-    print(f"\nFigure saved to: {save_path}")
-    print(f"\nComparing {num_samples} point clouds projected with:")
-    print("  - Initial (Untrained projector)")
-    print("  - Generative Loss (language modeling)")
-    print("  - Contrastive Loss (InfoNCE)")
-    print("\nKey findings:")
-    
-    # Determine best approach
-    findings = []
-    
-    # Centroid distance (lower is better)
-    best_centroid = min(
-        (init_metrics['centroid_distance'], 'Initial'),
-        (gen_metrics['centroid_distance'], 'Generative'),
-        (cont_metrics['centroid_distance'], 'Contrastive')
-    )
-    findings.append(f"  ✓ {best_centroid[1]} has CLOSEST centroid to text space ({best_centroid[0]:.2f})")
-    
-    # Cosine similarity (higher is better)
-    best_cosine = max(
-        (init_metrics['avg_cosine_similarity'], 'Initial'),
-        (gen_metrics['avg_cosine_similarity'], 'Generative'),
-        (cont_metrics['avg_cosine_similarity'], 'Contrastive')
-    )
-    findings.append(f"  ✓ {best_cosine[1]} has HIGHEST cosine similarity ({best_cosine[0]:.3f})")
-    
-    for finding in findings:
-        print(finding)
-    
-    print("\n" + "=" * 70)
+    print(f"\nVisualization complete! Figure saved to: {save_path}")
+    # print("\n" + "=" * 70)
+    # print("SUMMARY")
+    # print("=" * 70)
+    # print("✓ Visualization complete!")
+    # print(f"\nFigure saved to: {save_path}")
+    # print(f"\nComparing {num_samples} point clouds projected with:")
+    # print("  - Initial (Untrained projector)")
+    # print("  - Generative Loss (language modeling)")
+    # print("  - Contrastive Loss (InfoNCE)")
+    # print("\nKey findings:")
+    # 
+    # # Determine best approach
+    # findings = []
+    # 
+    # # Centroid distance (lower is better)
+    # best_centroid = min(
+    #     (init_metrics['centroid_distance'], 'Initial'),
+    #     (gen_metrics['centroid_distance'], 'Generative'),
+    #     (cont_metrics['centroid_distance'], 'Contrastive')
+    # )
+    # findings.append(f"  ✓ {best_centroid[1]} has CLOSEST centroid to text space ({best_centroid[0]:.2f})")
+    # 
+    # # Cosine similarity (higher is better)
+    # best_cosine = max(
+    #     (init_metrics['avg_cosine_similarity'], 'Initial'),
+    #     (gen_metrics['avg_cosine_similarity'], 'Generative'),
+    #     (cont_metrics['avg_cosine_similarity'], 'Contrastive')
+    # )
+    # findings.append(f"  ✓ {best_cosine[1]} has HIGHEST cosine similarity ({best_cosine[0]:.3f})")
+    # 
+    # for finding in findings:
+    #     print(finding)
+    # 
+    # print("\n" + "=" * 70)
 
 
 if __name__ == "__main__":

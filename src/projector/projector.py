@@ -18,6 +18,7 @@ class ProjectionLayer(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, output_dim)
         self.activation = nn.GELU()
+        self.layer_norm = nn.LayerNorm(output_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -34,4 +35,5 @@ class ProjectionLayer(nn.Module):
         x = self.activation(self.fc1(x))
         x = self.activation(self.fc2(x))
         x = self.fc3(x)
+        x = self.layer_norm(x)
         return x
